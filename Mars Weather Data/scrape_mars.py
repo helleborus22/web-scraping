@@ -3,6 +3,7 @@ from splinter import Browser
 from bs4 import BeautifulSoup as soup
 #import pandas as pd
 from webdriver_manager.chrome import ChromeDriverManager
+import datetime as dt
 
 #scrape all function
 def scrape_all():
@@ -14,13 +15,14 @@ def scrape_all():
 
     #get the info from the news page
     news_title, news_paragraph = scrape_news(browser)
+    
     #build a dictionary using the information from the scrapes
     marsData = {
         "newsTitle": news_title,
         "newsParagraph": news_paragraph,
         "featuredImage": scrape_feature_img(browser),
         "facts": scrape_facts_page(browser),
-        "hemispheres": scrape_hemispheres(browser),
+        "hemispheres": hemispheres(browser),
         "lastUpdated": dt.datetime.now()
     }
 
@@ -50,6 +52,8 @@ def scrape_news(browser):
     #grabs the parent element to find the paragraph text
     news_p = slide_elem.find('div', class_='article_teaser_body').get_text()
     
+    return news_title, news_p
+
 #scrape through the image page
 def scrape_feature_img(browser):
     #visit URL
@@ -85,7 +89,7 @@ def scrape_facts_page(browser):
 
     #find the facts location
     factslocation = fact_soup.find('div', class_="diagram mt-4")
-    factTable = factsLocation.find('table')
+    factTable = factslocation.find('table')
 
     #create an empty string
     facts = ""
@@ -96,13 +100,13 @@ def scrape_facts_page(browser):
     return facts
 
 #scrape through the hemispheres
-def hemispheres():
+def hemispheres(browser):
     #base url
     url = "https://marshemispheres.com/"
     browser.visit(url)
 
     #create a list to hold the images and titles
-    hemispheres_image_urls = []
+    hemisphere_image_urls = []
 
     #set up the loop
     for i in range(4):
@@ -125,7 +129,7 @@ def hemispheres():
         #finally, we navigate backwards
         browser.back()
     #return the hemisphere urls with the titles
-    return hemispheres_image_urls
+    return hemisphere_image_urls
 
 #set up as a flask app
 if __name__ == "__main__":
